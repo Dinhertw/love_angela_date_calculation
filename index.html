@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>戀愛紀念日 - SweetAlert2 匯出版</title>
-  <!-- 引入截圖套件 -->
+  <title>戀愛紀念日</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <!-- 引入 SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     * {
@@ -144,11 +142,10 @@
       white-space: nowrap;
     }
 
-    /* 匯出按鈕樣式 */
-    .export-btn {
+    /* 按鈕共用樣式 */
+    .action-btn {
       position: absolute;
       bottom: 4%;
-      right: 4%;
       z-index: 10;
       padding: 8px 16px;
       font-size: clamp(0.7rem, 1.5vw, 0.95rem);
@@ -159,20 +156,33 @@
       cursor: pointer;
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
+      transition: background 0.2s;
+    }
+
+    .action-btn:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    /* 匯出按鈕 (右下角) */
+    .export-btn {
+      right: 4%;
+    }
+
+    /* 設定按鈕 (左下角) */
+    .settings-btn {
+      left: 4%;
     }
   </style>
 </head>
 <body>
 
-  <!-- 16:9 卡片本體 (畫面上顯示用) -->
   <div class="app-card" id="card-node">
     <div class="overlay"></div>
 
     <div class="container">
-      <div class="title">禾禾愛啦啦</div>
+      <div class="title" id="card-title">戀愛紀念日</div>
 
       <div class="main-content">
-        <!-- 左邊頭像 -->
         <div class="profile">
           <div class="avatar-wrapper">
             <img id="left-img" src="" alt="" crossorigin="anonymous">
@@ -180,12 +190,10 @@
           <div class="name" id="left-name"></div>
         </div>
 
-        <!-- 中央天數 -->
         <div class="counter-box">
           <div class="days" id="days-count">0</div>
         </div>
 
-        <!-- 右邊頭像 -->
         <div class="profile">
           <div class="avatar-wrapper">
             <img id="right-img" src="" alt="" crossorigin="anonymous">
@@ -198,12 +206,16 @@
       <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
     </div>
 
-    <!-- 匯出按鈕 -->
-    <button class="export-btn" onclick="exportTo16by9Image()">📸 匯出 16:9 圖片</button>
+    <button class="action-btn settings-btn" onclick="openSettings()">⚙️</button>
+    <button class="action-btn export-btn" onclick="exportTo16by9Image()">📸</button>
   </div>
 
   <script>
-    const CONFIG = {
+    // ==========================================
+    // ⚙️ 程式碼預設設定區（您可以直接在這修改預設值）
+    // ==========================================
+    const DEFAULT_CONFIG = {
+      title: '禾禾愛啦啦',
       bgUrl: 'bg.jpg',
       leftImgUrl: 'd.jpg',
       leftName: '禾禾',
@@ -212,20 +224,34 @@
       startDate: { year: 2023, month: 1, day: 12 }
     };
 
+    function getConfig() {
+      const saved = localStorage.getItem('anniversary_config');
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) { return DEFAULT_CONFIG; }
+      }
+      return DEFAULT_CONFIG;
+    }
+
+    function saveConfig(newConfig) {
+      localStorage.setItem('anniversary_config', JSON.stringify(newConfig));
+    }
+
     function init() {
+      const config = getConfig();
       const cardNode = document.getElementById('card-node');
 
-      if (CONFIG.bgUrl) {
-        cardNode.style.backgroundImage = `url('${CONFIG.bgUrl}')`;
+      if (config.bgUrl) {
+        cardNode.style.backgroundImage = `url('${config.bgUrl}')`;
       }
 
-      document.getElementById('left-img').src = CONFIG.leftImgUrl;
-      document.getElementById('left-name').textContent = CONFIG.leftName;
-      document.getElementById('right-img').src = CONFIG.rightImgUrl;
-      document.getElementById('right-name').textContent = CONFIG.rightName;
+      document.getElementById('card-title').textContent = config.title;
+      document.getElementById('left-img').src = config.leftImgUrl;
+      document.getElementById('left-name').textContent = config.leftName;
+      document.getElementById('right-img').src = config.rightImgUrl;
+      document.getElementById('right-name').textContent = config.rightName;
 
       const offset8MS = 8 * 60 * 60 * 1000;
-      const startUTC = Date.UTC(CONFIG.startDate.year, CONFIG.startDate.month - 1, CONFIG.startDate.day);
+      const startUTC = Date.UTC(config.startDate.year, config.startDate.month - 1, config.startDate.day);
 
       const now = new Date();
       const todayUTC8 = new Date(now.getTime() + offset8MS);
@@ -237,18 +263,88 @@
       const weekDays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
       const startDateObj = new Date(startUTC);
       const weekName = weekDays[startDateObj.getUTCDay()];
-      const formattedMonth = String(CONFIG.startDate.month).padStart(2, '0');
-      const formattedDay = String(CONFIG.startDate.day).padStart(2, '0');
+      const formattedMonth = String(config.startDate.month).padStart(2, '0');
+      const formattedDay = String(config.startDate.day).padStart(2, '0');
 
       document.getElementById('date-display').textContent = 
-        `開始日 ${CONFIG.startDate.year}/${formattedMonth}/${formattedDay} ${weekName}`;
+        `開始日 ${config.startDate.year}/${formattedMonth}/${formattedDay} ${weekName}`;
+    }
+
+    // ==========================================
+    // ⚙️ 開啟 SweetAlert2 設定面板
+    // ==========================================
+    async function openSettings() {
+      const config = getConfig();
+
+      const { value: formValues, isDenied } = await Swal.fire({
+        title: '⚙️ 設定',
+        html: `
+          <div style="text-align: left; margin-bottom: 10px;">
+            <label style="font-size: 0.9rem; font-weight: bold; color: #333;">紀念日標題：</label>
+            <input id="swal-title" class="swal2-input" value="${config.title}" style="margin: 5px 0 15px 0; width: 100%;">
+            
+            <label style="font-size: 0.9rem; font-weight: bold; color: #333;">左邊名字：</label>
+            <input id="swal-left-name" class="swal2-input" value="${config.leftName}" style="margin: 5px 0 15px 0; width: 100%;">
+            
+            <label style="font-size: 0.9rem; font-weight: bold; color: #333;">右邊名字：</label>
+            <input id="swal-right-name" class="swal2-input" value="${config.rightName}" style="margin: 5px 0 0 0; width: 100%;">
+          </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: '保存設定',
+        denyButtonText: '🔄 恢復預設',
+        cancelButtonText: '取消',
+        confirmButtonColor: '#ff4d6d',
+        denyButtonColor: '#6c757d',
+        preConfirm: () => {
+          return {
+            title: document.getElementById('swal-title').value.trim() || DEFAULT_CONFIG.title,
+            leftName: document.getElementById('swal-left-name').value.trim() || DEFAULT_CONFIG.leftName,
+            rightName: document.getElementById('swal-right-name').value.trim() || DEFAULT_CONFIG.rightName
+          }
+        }
+      });
+
+      // 點擊「恢復預設」按鈕：清除暫存並套用程式碼預設值
+      if (isDenied) {
+        localStorage.removeItem('anniversary_config');
+        init();
+        Swal.fire({
+          icon: 'success',
+          title: '已恢復為程式碼預設值！',
+          timer: 1200,
+          showConfirmButton: false
+        });
+        return;
+      }
+
+      // 點擊「保存設定」
+      if (formValues) {
+        const currentConfig = getConfig();
+        currentConfig.title = formValues.title;
+        currentConfig.leftName = formValues.leftName;
+        currentConfig.rightName = formValues.rightName;
+        
+        saveConfig(currentConfig);
+        init();
+
+        Swal.fire({
+          icon: 'success',
+          title: '已更新設定！',
+          timer: 1200,
+          showConfirmButton: false
+        });
+      }
     }
 
     // ==========================================
     // 📸 產生截圖並以 SweetAlert2 彈窗顯示
     // ==========================================
     async function exportTo16by9Image() {
-      // 顯示讀取中提示
+      const config = getConfig();
+
       Swal.fire({
         title: '正在產生圖片...',
         text: '請稍候，正在合成高畫質 16:9 畫面',
@@ -258,14 +354,13 @@
         }
       });
 
-      // 建立隱藏容器進行標準 960x540 截圖
       const exportContainer = document.createElement('div');
       exportContainer.style.position = 'fixed';
       exportContainer.style.left = '-9999px';
       exportContainer.style.top = '-9999px';
       exportContainer.style.width = '960px';
       exportContainer.style.height = '540px';
-      exportContainer.style.backgroundImage = `url('${CONFIG.bgUrl}')`;
+      exportContainer.style.backgroundImage = `url('${config.bgUrl}')`;
       exportContainer.style.backgroundSize = 'cover';
       exportContainer.style.backgroundPosition = 'center';
       exportContainer.style.backgroundRepeat = 'no-repeat';
@@ -280,22 +375,22 @@
       exportContainer.innerHTML = `
         <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.2);z-index:1;"></div>
         <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:40px;">
-          <div style="font-size:2.2rem;letter-spacing:3px;margin-bottom:15px;font-weight:400;">戀愛紀念日</div>
+          <div style="font-size:2.2rem;letter-spacing:3px;margin-bottom:15px;font-weight:400;">${config.title}</div>
           <div style="display:flex;align-items:center;justify-content:space-between;width:650px;margin-bottom:10px;">
             <div style="display:flex;flex-direction:column;align-items:center;width:120px;">
               <div style="width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.85);overflow:hidden;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;justify-content:center;align-items:center;background-color:rgba(255,255,255,0.2);">
-                <img src="${CONFIG.leftImgUrl}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;">
+                <img src="${config.leftImgUrl}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;">
               </div>
-              <div style="font-size:1.3rem;font-weight:500;white-space:nowrap;">${CONFIG.leftName}</div>
+              <div style="font-size:1.3rem;font-weight:500;white-space:nowrap;">${config.leftName}</div>
             </div>
             <div style="text-align:center;flex:1;">
               <div style="font-size:5.5rem;font-weight:700;line-height:1;letter-spacing:2px;">${document.getElementById('days-count').textContent}</div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;width:120px;">
               <div style="width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.85);overflow:hidden;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;justify-content:center;align-items:center;background-color:rgba(255,255,255,0.2);">
-                <img src="${CONFIG.rightImgUrl}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;">
+                <img src="${config.rightImgUrl}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;">
               </div>
-              <div style="font-size:1.3rem;font-weight:500;white-space:nowrap;">${CONFIG.rightName}</div>
+              <div style="font-size:1.3rem;font-weight:500;white-space:nowrap;">${config.rightName}</div>
             </div>
           </div>
           <div style="font-size:1.3rem;margin-top:15px;margin-bottom:25px;letter-spacing:2px;">天</div>
@@ -309,23 +404,22 @@
         const canvas = await html2canvas(exportContainer, {
           useCORS: true,
           allowTaint: true,
-          scale: 2, // 2倍高畫質 (1920x1080)
+          scale: 2,
           logging: false,
           width: 960,
           height: 540
         });
 
         const dataURL = canvas.toDataURL('image/png');
-        const fileDate = `${CONFIG.startDate.year}${String(CONFIG.startDate.month).padStart(2, '0')}${String(CONFIG.startDate.day).padStart(2, '0')}`;
-        const fileName = `戀愛紀念日_${fileDate}_16x9.png`;
+        const fileDate = `${config.startDate.year}${String(config.startDate.month).padStart(2, '0')}${String(config.startDate.day).padStart(2, '0')}`;
+        const fileName = `紀念日_${fileDate}_16x9.png`;
 
-        // 使用 SweetAlert2 彈出視窗展示圖片，支援長按存檔與按鈕直接下載
         Swal.fire({
           title: '✨ 紀念日圖片已完成！',
           html: `
             <p style="font-size: 0.9rem; color: #666; margin-bottom: 12px;">手機可直接長按圖片儲存，或點下方按鈕下載</p>
             <div style="width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-              <img src="${dataURL}" style="width: 100%; display: block; border-radius: 6px;" alt="戀愛紀念日預覽">
+              <img src="${dataURL}" style="width: 100%; display: block; border-radius: 6px;" alt="紀念日圖片預覽">
             </div>
           `,
           showCloseButton: true,
