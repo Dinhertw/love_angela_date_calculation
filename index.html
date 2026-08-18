@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>戀愛紀念日 - 16:9 匯出版</title>
+  <!-- 引入截圖套件 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow-x: hidden;
+      background-color: #1a1a1a;
+    }
+
+    /* 包含背景與內容的 16:9 核心容器 */
+    .app-card {
+      position: relative;
+      width: 100vw;
+      max-width: 960px; /* 16:9 寬度，高會自動調整為 540px */
+      aspect-ratio: 16 / 9; /* 強制保持 16:9 比例 */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    /* 半透明背景遮罩 */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.15);
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 650px;
+      padding: 20px;
+    }
+
+    .title {
+      font-size: 2.2rem;
+      letter-spacing: 3px;
+      margin-bottom: 25px;
+      font-weight: 400;
+    }
+
+    .main-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 120px;
+    }
+
+    .avatar-wrapper {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.85);
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .name {
+      font-size: 1.3rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .counter-box {
+      text-align: center;
+      flex: 1;
+    }
+
+    .days {
+      font-size: 5.5rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 2px;
+    }
+
+    .unit {
+      font-size: 1.3rem;
+      margin-top: 15px;
+      margin-bottom: 25px;
+      letter-spacing: 2px;
+    }
+
+    .start-date {
+      font-size: 1.15rem;
+      letter-spacing: 1px;
+      opacity: 0.95;
+      white-space: nowrap;
+    }
+
+    /* 匯出按鈕樣式 */
+    .export-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 10;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 25px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .export-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* 截圖輸出時自動隱藏按鈕 */
+    .rendering .export-btn {
+      display: none !important;
+    }
+
+    /* 📱 手機響應式適配 */
+    @media (max-width: 600px) {
+      .app-card {
+        width: 100vw;
+        height: auto;
+        min-height: calc(100vw * 9 / 16);
+      }
+
+      .container {
+        padding: 10px;
+      }
+
+      .title {
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+      }
+
+      .avatar-wrapper {
+        width: 60px;
+        height: 60px;
+        border-width: 2px;
+        margin-bottom: 6px;
+      }
+
+      .profile {
+        width: 70px;
+      }
+
+      .name {
+        font-size: 0.9rem;
+      }
+
+      .days {
+        font-size: 3rem;
+      }
+
+      .unit {
+        font-size: 0.95rem;
+        margin-top: 8px;
+        margin-bottom: 12px;
+      }
+
+      .start-date {
+        font-size: 0.85rem;
+      }
+
+      .export-btn {
+        bottom: 10px;
+        right: 10px;
+        padding: 6px 14px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 16:9 卡片本體 -->
+  <div class="app-card" id="card-node">
+    <div class="overlay"></div>
+
+    <div class="container">
+      <div class="title">禾禾愛啦啦</div>
+
+      <div class="main-content">
+        <!-- 左邊頭像 -->
+        <div class="profile">
+          <div class="avatar-wrapper">
+            <img id="left-img" src="" alt="">
+          </div>
+          <div class="name" id="left-name"></div>
+        </div>
+
+        <!-- 中央天數 -->
+        <div class="counter-box">
+          <div class="days" id="days-count">0</div>
+        </div>
+
+        <!-- 右邊頭像 -->
+        <div class="profile">
+          <div class="avatar-wrapper">
+            <img id="right-img" src="" alt="">
+          </div>
+          <div class="name" id="right-name"></div>
+        </div>
+      </div>
+
+      <div class="unit">天</div>
+      <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
+    </div>
+
+    <!-- 匯出按鈕 -->
+    <button class="export-btn" onclick="exportTo16by9Image()">📸 匯出圖片</button>
+  </div>
+
+  <script>
+    // ==========================================
+    // ⚙️ 設定區（請在此替換背景與頭像網址）
+    // ==========================================
+    const CONFIG = {
+      // 1. 背景圖片連結
+      bgUrl: 'bg.jpg',
+      
+      // 2. 左邊頭像與暱稱
+      leftImgUrl: 'd.jpg',
+      leftName: '禾禾',
+
+      // 3. 右邊頭像與暱稱
+      rightImgUrl: 'm.jpg',
+      rightName: '啦啦',
+
+      // 4. 開始日期 (年, 月, 日)
+      startDate: {
+        year: 2023,
+        month: 1,
+        day: 12
+      }
+    };
+
+    // ==========================================
+    // 🚀 頁面初始化 (UTC+8 計算，不+1天)
+    // ==========================================
+    function init() {
+      const cardNode = document.getElementById('card-node');
+
+      // 設定背景圖
+      if (CONFIG.bgUrl) {
+        cardNode.style.backgroundImage = `url('${CONFIG.bgUrl}')`;
+      }
+
+      // 設定照片與名稱
+      document.getElementById('left-img').src = CONFIG.leftImgUrl;
+      document.getElementById('left-name').textContent = CONFIG.leftName;
+      document.getElementById('right-img').src = CONFIG.rightImgUrl;
+      document.getElementById('right-name').textContent = CONFIG.rightName;
+
+      // UTC+8 時區天數計算 (不+1天)
+      const offset8MS = 8 * 60 * 60 * 1000;
+      const startUTC = Date.UTC(CONFIG.startDate.year, CONFIG.startDate.month - 1, CONFIG.startDate.day);
+
+      const now = new Date();
+      const todayUTC8 = new Date(now.getTime() + offset8MS);
+      const todayUTC = Date.UTC(todayUTC8.getUTCFullYear(), todayUTC8.getUTCMonth(), todayUTC8.getUTCDate());
+
+      const diffDays = Math.floor((todayUTC - startUTC) / (1000 * 60 * 60 * 24));
+      document.getElementById('days-count').textContent = diffDays;
+
+      // 日期與星期格式化
+      const weekDays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+      const startDateObj = new Date(startUTC);
+      const weekName = weekDays[startDateObj.getUTCDay()];
+      const formattedMonth = String(CONFIG.startDate.month).padStart(2, '0');
+      const formattedDay = String(CONFIG.startDate.day).padStart(2, '0');
+
+      document.getElementById('date-display').textContent = 
+        `開始日 ${CONFIG.startDate.year}/${formattedMonth}/${formattedDay} ${weekName}`;
+    }
+
+    // ==========================================
+    // 📸 匯出 16:9 圖片核心邏輯
+    // ==========================================
+    async function exportTo16by9Image() {
+      const cardNode = document.getElementById('card-node');
+      
+      // 1. 隱藏匯出按鈕
+      cardNode.classList.add('rendering');
+
+      try {
+        // 2. 擷取整個 16:9 卡片容器
+        const canvas = await html2canvas(cardNode, {
+          useCORS: true,       // 允許跨域圖片
+          allowTaint: false,
+          scale: 2,            // 輸出 2 倍高清圖 (如 1920x1080 規格)
+          logging: false
+        });
+
+        // 3. 自動觸發下載
+        const link = document.createElement('a');
+        const fileDate = `${CONFIG.startDate.year}${String(CONFIG.startDate.month).padStart(2, '0')}${String(CONFIG.startDate.day).padStart(2, '0')}`;
+        link.download = `戀愛紀念日_${fileDate}_16x9.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (error) {
+        console.error('圖片匯出失敗：', error);
+        alert('匯出失敗！若有使用外部圖片網址，請確認圖片伺服器支援 CORS 跨域存取。');
+      } finally {
+        // 4. 恢復顯示按鈕
+        cardNode.classList.remove('rendering');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
