@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>戀愛紀念日</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+      
+      /* 設定背景圖：預設選用類似飛機機翼與夕陽天空的圖片 */
+      background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1600&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* 遮罩讓文字更清晰 */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.15);
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+    }
+
+    .title {
+      font-size: 2rem;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .main-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100px;
+    }
+
+    .avatar-wrapper {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.8);
+      overflow: hidden;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      
+      /* 確保圖片自動置中 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 自動裁切置中 */
+      object-position: center;
+    }
+
+    .name {
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+
+    .counter-box {
+      text-align: center;
+    }
+
+    .days {
+      font-size: 5rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 2px;
+    }
+
+    .unit {
+      font-size: 1.2rem;
+      margin-top: 15px;
+      margin-bottom: 25px;
+      letter-spacing: 2px;
+    }
+
+    .start-date {
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      opacity: 0.95;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay"></div>
+
+  <div class="container">
+    <div class="title">戀愛紀念日</div>
+
+    <div class="main-content">
+      <!-- 左邊頭像 -->
+      <div class="profile">
+        <div class="avatar-wrapper">
+          <img id="left-img" src="" alt="帥帥">
+        </div>
+        <div class="name" id="left-name">帥帥</div>
+      </div>
+
+      <!-- 中央天數顯示 -->
+      <div class="counter-box">
+        <div class="days" id="days-count">0</div>
+      </div>
+
+      <!-- 右邊頭像 -->
+      <div class="profile">
+        <div class="avatar-wrapper">
+          <img id="right-img" src="" alt="啦啦">
+        </div>
+        <div class="name" id="right-name">啦啦</div>
+      </div>
+    </div>
+
+    <div class="unit">天</div>
+    <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
+  </div>
+
+  <script>
+// ==========================================
+// ⚙️ 網址與設定區（請在此替換 your 圖片連結）
+// ==========================================
+const CONFIG = {
+  // 1. 背景圖片連結
+  bgUrl: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1600&auto=format&fit=crop',
+  
+  // 2. 左邊頭像連結與暱稱
+  leftImgUrl: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=300&auto=format&fit=crop',
+  leftName: '帥帥',
+
+  // 3. 右邊頭像連結與暱稱
+  rightImgUrl: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=300&auto=format&fit=crop',
+  rightName: '啦啦',
+
+  // 4. 開始紀念日期 (年, 月, 日) - 請直接填寫 1~12 月
+  startDate: {
+    year: 2023,
+    month: 1,
+    day: 12
+  }
+};
+
+// ==========================================
+// 🚀 頁面邏輯渲染 (UTC+8 時區計算)
+// ==========================================
+function init() {
+  // 設定背景圖
+  if (CONFIG.bgUrl) {
+    document.body.style.backgroundImage = `url('${CONFIG.bgUrl}')`;
+  }
+
+  // 設定照片與名稱
+  document.getElementById('left-img').src = CONFIG.leftImgUrl;
+  document.getElementById('left-name').textContent = CONFIG.leftName;
+  document.getElementById('right-img').src = CONFIG.rightImgUrl;
+  document.getElementById('right-name').textContent = CONFIG.rightName;
+
+  // 強制建立 UTC+8 的 Date 物件 (毫秒數計算)
+  const offset8MS = 8 * 60 * 60 * 1000;
+  
+  // 開始日期 (以 UTC+8 凌晨 00:00:00 計算)
+  const startYear = CONFIG.startDate.year;
+  const startMonth = CONFIG.startDate.month - 1;
+  const startDay = CONFIG.startDate.day;
+  const startUTC = Date.UTC(startYear, startMonth, startDay);
+
+  // 當前時間轉換為 UTC+8 當天的 00:00:00
+  const now = new Date();
+  const todayUTC8 = new Date(now.getTime() + offset8MS);
+  const todayUTC = Date.UTC(todayUTC8.getUTCFullYear(), todayUTC8.getUTCMonth(), todayUTC8.getUTCDate());
+
+  // 計算日數差（不 +1 天）
+  const diffDays = Math.floor((todayUTC - startUTC) / (1000 * 60 * 60 * 24));
+
+  document.getElementById('days-count').textContent = diffDays;
+
+  // 格式化顯示開始日期與星期幾 (根據 UTC+8 計算)
+  const weekDays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+  const startDateObj = new Date(startUTC);
+  const weekName = weekDays[startDateObj.getUTCDay()];
+  const formattedMonth = String(CONFIG.startDate.month).padStart(2, '0');
+  const formattedDay = String(CONFIG.startDate.day).padStart(2, '0');
+
+  document.getElementById('date-display').textContent = 
+    `開始日 ${CONFIG.startDate.year}/${formattedMonth}/${formattedDay} ${weekName}`;
+}
+
+init();
+  </script>
+</body>
+</html>
