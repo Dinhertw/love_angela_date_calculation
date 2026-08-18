@@ -2,9 +2,12 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>戀愛紀念日 - 完美置中響應式版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>戀愛紀念日 - SweetAlert2 匯出版</title>
+  <!-- 引入截圖套件 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- 引入 SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -19,28 +22,18 @@
       align-items: center;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow: hidden;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
       background-color: #121212;
+      overflow: hidden;
       -webkit-text-size-adjust: 100%;
     }
 
-    /* 置中對齊的縮放外層容器 */
-    .scaler-wrapper {
-      position: relative;
-      width: 960px;
-      height: 540px;
-      transform-origin: center center;
-    }
-
-    /* 16:9 核心卡片 (基準尺寸固定為 960x540) */
+    /* 16:9 核心容器（純響應式，自動適應手機與電腦畫面） */
     .app-card {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 960px;
-      height: 540px;
+      position: relative;
+      width: 95vw;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -48,8 +41,10 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border-radius: 8px;
       overflow: hidden;
+      margin: auto;
     }
 
     /* 半透明背景遮罩 */
@@ -59,7 +54,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.15);
+      background: rgba(0, 0, 0, 0.2);
       z-index: 1;
     }
 
@@ -69,15 +64,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       width: 100%;
-      max-width: 650px;
-      padding: 20px;
+      height: 100%;
+      padding: 4%;
     }
 
     .title {
-      font-size: 2.2rem;
+      font-size: clamp(1rem, 3.5vw, 2.2rem);
       letter-spacing: 3px;
-      margin-bottom: 25px;
+      margin-bottom: 2%;
       font-weight: 400;
     }
 
@@ -85,26 +81,25 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      width: 100%;
-      margin-bottom: 10px;
+      width: 80%;
+      margin-bottom: 1%;
     }
 
     .profile {
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 120px;
+      width: 25%;
     }
 
     .avatar-wrapper {
-      width: 100px;
-      height: 100px;
+      width: clamp(50px, 12vw, 100px);
+      height: clamp(50px, 12vw, 100px);
       border-radius: 50%;
       border: 3px solid rgba(255, 255, 255, 0.85);
       overflow: hidden;
-      margin-bottom: 12px;
+      margin-bottom: 8%;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      
       display: flex;
       justify-content: center;
       align-items: center;
@@ -115,11 +110,10 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center;
     }
 
     .name {
-      font-size: 1.3rem;
+      font-size: clamp(0.75rem, 2vw, 1.3rem);
       font-weight: 500;
       white-space: nowrap;
     }
@@ -130,21 +124,21 @@
     }
 
     .days {
-      font-size: 5.5rem;
+      font-size: clamp(2.5rem, 9vw, 5.5rem);
       font-weight: 700;
       line-height: 1;
       letter-spacing: 2px;
     }
 
     .unit {
-      font-size: 1.3rem;
-      margin-top: 15px;
-      margin-bottom: 25px;
+      font-size: clamp(0.8rem, 2vw, 1.3rem);
+      margin-top: 2%;
+      margin-bottom: 3%;
       letter-spacing: 2px;
     }
 
     .start-date {
-      font-size: 1.15rem;
+      font-size: clamp(0.7rem, 1.8vw, 1.15rem);
       letter-spacing: 1px;
       opacity: 0.95;
       white-space: nowrap;
@@ -153,140 +147,83 @@
     /* 匯出按鈕樣式 */
     .export-btn {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
+      bottom: 4%;
+      right: 4%;
       z-index: 10;
-      padding: 10px 20px;
-      font-size: 0.95rem;
+      padding: 8px 16px;
+      font-size: clamp(0.7rem, 1.5vw, 0.95rem);
       color: #ffffff;
       background: rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 25px;
+      border-radius: 20px;
       cursor: pointer;
       -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .export-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* 截圖輸出時自動隱藏按鈕 */
-    .rendering .export-btn {
-      display: none !important;
     }
   </style>
 </head>
 <body>
 
-  <div class="scaler-wrapper" id="scaler-wrapper">
-    <div class="app-card" id="card-node">
-      <div class="overlay"></div>
+  <!-- 16:9 卡片本體 (畫面上顯示用) -->
+  <div class="app-card" id="card-node">
+    <div class="overlay"></div>
 
-      <div class="container">
-        <div class="title">戀愛紀念日</div>
+    <div class="container">
+      <div class="title">禾禾愛啦啦</div>
 
-        <div class="main-content">
-          <div class="profile">
-            <div class="avatar-wrapper">
-              <img id="left-img" src="" alt="帥帥" crossorigin="anonymous">
-            </div>
-            <div class="name" id="left-name">帥帥</div>
+      <div class="main-content">
+        <!-- 左邊頭像 -->
+        <div class="profile">
+          <div class="avatar-wrapper">
+            <img id="left-img" src="" alt="" crossorigin="anonymous">
           </div>
-
-          <div class="counter-box">
-            <div class="days" id="days-count">0</div>
-          </div>
-
-          <div class="profile">
-            <div class="avatar-wrapper">
-              <img id="right-img" src="" alt="啦啦" crossorigin="anonymous">
-            </div>
-            <div class="name" id="right-name">啦啦</div>
-          </div>
+          <div class="name" id="left-name"></div>
         </div>
 
-        <div class="unit">天</div>
-        <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
+        <!-- 中央天數 -->
+        <div class="counter-box">
+          <div class="days" id="days-count">0</div>
+        </div>
+
+        <!-- 右邊頭像 -->
+        <div class="profile">
+          <div class="avatar-wrapper">
+            <img id="right-img" src="" alt="" crossorigin="anonymous">
+          </div>
+          <div class="name" id="right-name"></div>
+        </div>
       </div>
 
-      <button class="export-btn" onclick="exportTo16by9Image()">📸 匯出 16:9 圖片</button>
+      <div class="unit">天</div>
+      <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
     </div>
+
+    <!-- 匯出按鈕 -->
+    <button class="export-btn" onclick="exportTo16by9Image()">📸 匯出 16:9 圖片</button>
   </div>
 
   <script>
-    // ==========================================
-    // ⚙️ 設定區（請在此替換背景與頭像網址）
-    // ==========================================
     const CONFIG = {
-      // 1. 背景圖片連結
       bgUrl: 'bg.jpg',
-      
-      // 2. 左邊頭像與暱稱
       leftImgUrl: 'd.jpg',
       leftName: '禾禾',
-
-      // 3. 右邊頭像與暱稱
       rightImgUrl: 'm.jpg',
       rightName: '啦啦',
-
-      // 4. 開始日期 (年, 月, 日)
-      startDate: {
-        year: 2023,
-        month: 1,
-        day: 12
-      }
+      startDate: { year: 2023, month: 1, day: 12 }
     };
 
-    // ==========================================
-    // 📐 置中與響應式等比例縮放計算
-    // ==========================================
-    function autoResize() {
-      const wrapper = document.getElementById('scaler-wrapper');
-      const baseWidth = 960;
-      const baseHeight = 540;
-
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-
-      // 保留安全邊距，計算縮放比例
-      const padding = 40;
-      const scaleX = (windowWidth - padding) / baseWidth;
-      const scaleY = (windowHeight - padding) / baseHeight;
-      let scale = Math.min(scaleX, scaleY);
-
-      // 如果螢幕夠大，最大維持原尺寸 (1倍)
-      if (scale > 1) {
-        scale = 1; 
-      }
-
-      wrapper.style.transform = `scale(${scale})`;
-    }
-
-    window.addEventListener('resize', autoResize);
-
-    // ==========================================
-    // 🚀 頁面初始化 (UTC+8 計算，不+1天)
-    // ==========================================
     function init() {
-      autoResize();
-
       const cardNode = document.getElementById('card-node');
 
-      // 設定背景圖
       if (CONFIG.bgUrl) {
         cardNode.style.backgroundImage = `url('${CONFIG.bgUrl}')`;
       }
 
-      // 設定照片與名稱
       document.getElementById('left-img').src = CONFIG.leftImgUrl;
       document.getElementById('left-name').textContent = CONFIG.leftName;
       document.getElementById('right-img').src = CONFIG.rightImgUrl;
       document.getElementById('right-name').textContent = CONFIG.rightName;
 
-      // UTC+8 時區天數計算 (不+1天)
       const offset8MS = 8 * 60 * 60 * 1000;
       const startUTC = Date.UTC(CONFIG.startDate.year, CONFIG.startDate.month - 1, CONFIG.startDate.day);
 
@@ -297,7 +234,6 @@
       const diffDays = Math.floor((todayUTC - startUTC) / (1000 * 60 * 60 * 24));
       document.getElementById('days-count').textContent = diffDays;
 
-      // 日期與星期格式化
       const weekDays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
       const startDateObj = new Date(startUTC);
       const weekName = weekDays[startDateObj.getUTCDay()];
@@ -309,20 +245,71 @@
     }
 
     // ==========================================
-    // 📸 支援跨平台與蘋果(iOS/Safari)的 16:9 截圖匯出
+    // 📸 產生截圖並以 SweetAlert2 彈窗顯示
     // ==========================================
     async function exportTo16by9Image() {
-      const cardNode = document.getElementById('card-node');
-      
-      // 1. 隱藏匯出按鈕
-      cardNode.classList.add('rendering');
+      // 顯示讀取中提示
+      Swal.fire({
+        title: '正在產生圖片...',
+        text: '請稍候，正在合成高畫質 16:9 畫面',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // 建立隱藏容器進行標準 960x540 截圖
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'fixed';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '-9999px';
+      exportContainer.style.width = '960px';
+      exportContainer.style.height = '540px';
+      exportContainer.style.backgroundImage = `url('${CONFIG.bgUrl}')`;
+      exportContainer.style.backgroundSize = 'cover';
+      exportContainer.style.backgroundPosition = 'center';
+      exportContainer.style.backgroundRepeat = 'no-repeat';
+      exportContainer.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      exportContainer.style.color = '#ffffff';
+      exportContainer.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.4)';
+      exportContainer.style.display = 'flex';
+      exportContainer.style.flexDirection = 'column';
+      exportContainer.style.justifyContent = 'center';
+      exportContainer.style.alignItems = 'center';
+
+      exportContainer.innerHTML = `
+        <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.2);z-index:1;"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:40px;">
+          <div style="font-size:2.2rem;letter-spacing:3px;margin-bottom:15px;font-weight:400;">戀愛紀念日</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;width:650px;margin-bottom:10px;">
+            <div style="display:flex;flex-direction:column;align-items:center;width:120px;">
+              <div style="width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.85);overflow:hidden;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;justify-content:center;align-items:center;background-color:rgba(255,255,255,0.2);">
+                <img src="${CONFIG.leftImgUrl}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div style="font-size:1.3rem;font-weight:500;white-space:nowrap;">${CONFIG.leftName}</div>
+            </div>
+            <div style="text-align:center;flex:1;">
+              <div style="font-size:5.5rem;font-weight:700;line-height:1;letter-spacing:2px;">${document.getElementById('days-count').textContent}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;width:120px;">
+              <div style="width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.85);overflow:hidden;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;justify-content:center;align-items:center;background-color:rgba(255,255,255,0.2);">
+                <img src="${CONFIG.rightImgUrl}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div style="font-size:1.3rem;font-weight:500;white-space:nowrap;">${CONFIG.rightName}</div>
+            </div>
+          </div>
+          <div style="font-size:1.3rem;margin-top:15px;margin-bottom:25px;letter-spacing:2px;">天</div>
+          <div style="font-size:1.15rem;letter-spacing:1px;opacity:0.95;white-space:nowrap;">${document.getElementById('date-display').textContent}</div>
+        </div>
+      `;
+
+      document.body.appendChild(exportContainer);
 
       try {
-        // 2. 以固定的 960x540 基準進行高畫質 2x 擷取 (1920x1080)
-        const canvas = await html2canvas(cardNode, {
+        const canvas = await html2canvas(exportContainer, {
           useCORS: true,
           allowTaint: true,
-          scale: 2,
+          scale: 2, // 2倍高畫質 (1920x1080)
           logging: false,
           width: 960,
           height: 540
@@ -332,32 +319,36 @@
         const fileDate = `${CONFIG.startDate.year}${String(CONFIG.startDate.month).padStart(2, '0')}${String(CONFIG.startDate.day).padStart(2, '0')}`;
         const fileName = `戀愛紀念日_${fileDate}_16x9.png`;
 
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-        if (isIOS) {
-          // iOS 裝置開啟獨立預覽視窗讓使用者長按儲存相簿
-          const newWindow = window.open();
-          if (newWindow) {
-            newWindow.document.write(`
-              <html>
-                <head><title>長按圖片儲存</title></head>
-                <body style="margin:0;background:#000;display:flex;justify-content:center;align-items:center;height:100vh;">
-                  <img src="${dataURL}" style="max-width:100%;max-height:100%;object-fit:contain;" alt="紀念日圖片">
-                </body>
-              </html>
-            `);
-          } else {
+        // 使用 SweetAlert2 彈出視窗展示圖片，支援長按存檔與按鈕直接下載
+        Swal.fire({
+          title: '✨ 紀念日圖片已完成！',
+          html: `
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 12px;">手機可直接長按圖片儲存，或點下方按鈕下載</p>
+            <div style="width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+              <img src="${dataURL}" style="width: 100%; display: block; border-radius: 6px;" alt="戀愛紀念日預覽">
+            </div>
+          `,
+          showCloseButton: true,
+          showConfirmButton: true,
+          confirmButtonText: '📥 直接下載圖片',
+          confirmButtonColor: '#ff4d6d',
+          width: '600px',
+          padding: '20px'
+        }).then((result) => {
+          if (result.isConfirmed) {
             triggerDownload(dataURL, fileName);
           }
-        } else {
-          triggerDownload(dataURL, fileName);
-        }
+        });
 
       } catch (error) {
         console.error('圖片匯出失敗：', error);
-        alert('匯出失敗！若圖片來自外部網址，請確認圖片伺服器允許跨域訪問。');
+        Swal.fire({
+          icon: 'error',
+          title: '匯出失敗',
+          text: '若圖片來自外部網址，請確認圖片伺服器允許跨域訪問。'
+        });
       } finally {
-        cardNode.classList.remove('rendering');
+        document.body.removeChild(exportContainer);
       }
     }
 
