@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>戀愛紀念日 - 16:9 匯出版</title>
-  <!-- 引入截圖套件 -->
+  <title>戀愛紀念日 - 完美置中響應式版</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     * {
@@ -22,16 +21,26 @@
       color: #ffffff;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       position: relative;
-      overflow-x: hidden;
-      background-color: #1a1a1a;
+      overflow: hidden;
+      background-color: #121212;
+      -webkit-text-size-adjust: 100%;
     }
 
-    /* 包含背景與內容的 16:9 核心容器 */
-    .app-card {
+    /* 置中對齊的縮放外層容器 */
+    .scaler-wrapper {
       position: relative;
-      width: 100vw;
-      max-width: 960px; /* 16:9 寬度，高會自動調整為 540px */
-      aspect-ratio: 16 / 9; /* 強制保持 16:9 比例 */
+      width: 960px;
+      height: 540px;
+      transform-origin: center center;
+    }
+
+    /* 16:9 核心卡片 (基準尺寸固定為 960x540) */
+    .app-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 960px;
+      height: 540px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -39,7 +48,7 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
       overflow: hidden;
     }
 
@@ -150,118 +159,61 @@
       padding: 10px 20px;
       font-size: 0.95rem;
       color: #ffffff;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.6);
       border-radius: 25px;
       cursor: pointer;
+      -webkit-backdrop-filter: blur(8px);
       backdrop-filter: blur(8px);
       transition: all 0.25s ease;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
-    .export-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
+    .export-btn:active {
+      transform: scale(0.95);
     }
 
     /* 截圖輸出時自動隱藏按鈕 */
     .rendering .export-btn {
       display: none !important;
     }
-
-    /* 📱 手機響應式適配 */
-    @media (max-width: 600px) {
-      .app-card {
-        width: 100vw;
-        height: auto;
-        min-height: calc(100vw * 9 / 16);
-      }
-
-      .container {
-        padding: 10px;
-      }
-
-      .title {
-        font-size: 1.4rem;
-        margin-bottom: 12px;
-      }
-
-      .avatar-wrapper {
-        width: 60px;
-        height: 60px;
-        border-width: 2px;
-        margin-bottom: 6px;
-      }
-
-      .profile {
-        width: 70px;
-      }
-
-      .name {
-        font-size: 0.9rem;
-      }
-
-      .days {
-        font-size: 3rem;
-      }
-
-      .unit {
-        font-size: 0.95rem;
-        margin-top: 8px;
-        margin-bottom: 12px;
-      }
-
-      .start-date {
-        font-size: 0.85rem;
-      }
-
-      .export-btn {
-        bottom: 10px;
-        right: 10px;
-        padding: 6px 14px;
-        font-size: 0.8rem;
-      }
-    }
   </style>
 </head>
 <body>
 
-  <!-- 16:9 卡片本體 -->
-  <div class="app-card" id="card-node">
-    <div class="overlay"></div>
+  <div class="scaler-wrapper" id="scaler-wrapper">
+    <div class="app-card" id="card-node">
+      <div class="overlay"></div>
 
-    <div class="container">
-      <div class="title">禾禾愛啦啦</div>
+      <div class="container">
+        <div class="title">戀愛紀念日</div>
 
-      <div class="main-content">
-        <!-- 左邊頭像 -->
-        <div class="profile">
-          <div class="avatar-wrapper">
-            <img id="left-img" src="" alt="">
+        <div class="main-content">
+          <div class="profile">
+            <div class="avatar-wrapper">
+              <img id="left-img" src="" alt="帥帥" crossorigin="anonymous">
+            </div>
+            <div class="name" id="left-name">帥帥</div>
           </div>
-          <div class="name" id="left-name"></div>
-        </div>
 
-        <!-- 中央天數 -->
-        <div class="counter-box">
-          <div class="days" id="days-count">0</div>
-        </div>
-
-        <!-- 右邊頭像 -->
-        <div class="profile">
-          <div class="avatar-wrapper">
-            <img id="right-img" src="" alt="">
+          <div class="counter-box">
+            <div class="days" id="days-count">0</div>
           </div>
-          <div class="name" id="right-name"></div>
+
+          <div class="profile">
+            <div class="avatar-wrapper">
+              <img id="right-img" src="" alt="啦啦" crossorigin="anonymous">
+            </div>
+            <div class="name" id="right-name">啦啦</div>
+          </div>
         </div>
+
+        <div class="unit">天</div>
+        <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
       </div>
 
-      <div class="unit">天</div>
-      <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
+      <button class="export-btn" onclick="exportTo16by9Image()">📸 匯出 16:9 圖片</button>
     </div>
-
-    <!-- 匯出按鈕 -->
-    <button class="export-btn" onclick="exportTo16by9Image()">📸 匯出圖片</button>
   </div>
 
   <script>
@@ -289,9 +241,38 @@
     };
 
     // ==========================================
+    // 📐 置中與響應式等比例縮放計算
+    // ==========================================
+    function autoResize() {
+      const wrapper = document.getElementById('scaler-wrapper');
+      const baseWidth = 960;
+      const baseHeight = 540;
+
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      // 保留安全邊距，計算縮放比例
+      const padding = 40;
+      const scaleX = (windowWidth - padding) / baseWidth;
+      const scaleY = (windowHeight - padding) / baseHeight;
+      let scale = Math.min(scaleX, scaleY);
+
+      // 如果螢幕夠大，最大維持原尺寸 (1倍)
+      if (scale > 1) {
+        scale = 1; 
+      }
+
+      wrapper.style.transform = `scale(${scale})`;
+    }
+
+    window.addEventListener('resize', autoResize);
+
+    // ==========================================
     // 🚀 頁面初始化 (UTC+8 計算，不+1天)
     // ==========================================
     function init() {
+      autoResize();
+
       const cardNode = document.getElementById('card-node');
 
       // 設定背景圖
@@ -328,7 +309,7 @@
     }
 
     // ==========================================
-    // 📸 匯出 16:9 圖片核心邏輯
+    // 📸 支援跨平台與蘋果(iOS/Safari)的 16:9 截圖匯出
     // ==========================================
     async function exportTo16by9Image() {
       const cardNode = document.getElementById('card-node');
@@ -337,27 +318,56 @@
       cardNode.classList.add('rendering');
 
       try {
-        // 2. 擷取整個 16:9 卡片容器
+        // 2. 以固定的 960x540 基準進行高畫質 2x 擷取 (1920x1080)
         const canvas = await html2canvas(cardNode, {
-          useCORS: true,       // 允許跨域圖片
-          allowTaint: false,
-          scale: 2,            // 輸出 2 倍高清圖 (如 1920x1080 規格)
-          logging: false
+          useCORS: true,
+          allowTaint: true,
+          scale: 2,
+          logging: false,
+          width: 960,
+          height: 540
         });
 
-        // 3. 自動觸發下載
-        const link = document.createElement('a');
+        const dataURL = canvas.toDataURL('image/png');
         const fileDate = `${CONFIG.startDate.year}${String(CONFIG.startDate.month).padStart(2, '0')}${String(CONFIG.startDate.day).padStart(2, '0')}`;
-        link.download = `戀愛紀念日_${fileDate}_16x9.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+        const fileName = `戀愛紀念日_${fileDate}_16x9.png`;
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        if (isIOS) {
+          // iOS 裝置開啟獨立預覽視窗讓使用者長按儲存相簿
+          const newWindow = window.open();
+          if (newWindow) {
+            newWindow.document.write(`
+              <html>
+                <head><title>長按圖片儲存</title></head>
+                <body style="margin:0;background:#000;display:flex;justify-content:center;align-items:center;height:100vh;">
+                  <img src="${dataURL}" style="max-width:100%;max-height:100%;object-fit:contain;" alt="紀念日圖片">
+                </body>
+              </html>
+            `);
+          } else {
+            triggerDownload(dataURL, fileName);
+          }
+        } else {
+          triggerDownload(dataURL, fileName);
+        }
+
       } catch (error) {
         console.error('圖片匯出失敗：', error);
-        alert('匯出失敗！若有使用外部圖片網址，請確認圖片伺服器支援 CORS 跨域存取。');
+        alert('匯出失敗！若圖片來自外部網址，請確認圖片伺服器允許跨域訪問。');
       } finally {
-        // 4. 恢復顯示按鈕
         cardNode.classList.remove('rendering');
       }
+    }
+
+    function triggerDownload(dataURL, fileName) {
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = dataURL;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     init();
