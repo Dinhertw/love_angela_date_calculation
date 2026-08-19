@@ -323,7 +323,7 @@
         
         Swal.fire({
           icon: 'success',
-          title: '已恢復為程式碼預設值！',
+          title: '已恢復為預設值！',
           timer: 1000,
           showConfirmButton: false
         }).then(() => {
@@ -345,7 +345,7 @@
         Swal.fire({
           icon: 'success',
           title: '已更新設定！',
-          timer: 1200,
+          timer: 1000,
           showConfirmButton: false
         });
       }
@@ -359,7 +359,7 @@
 
       Swal.fire({
         title: '正在產生圖片...',
-        text: '請稍候，正在合成高畫質 16:9 畫面',
+        text: '',
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
@@ -427,9 +427,9 @@
         const fileName = `紀念日_${fileDate}_16x9.png`;
 
         Swal.fire({
-          title: '✨ 紀念日圖片已完成！',
+          title: '✨ 圖片已完成！',
           html: `
-            <p style="font-size: 0.9rem; color: #666; margin-bottom: 12px;">手機可直接長按圖片儲存，或點下方按鈕下載</p>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 12px;">可直接長按圖片儲存，或點下方按鈕下載</p>
             <div style="width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
               <img src="${dataURL}" style="width: 100%; display: block; border-radius: 6px;" alt="紀念日圖片預覽">
             </div>
