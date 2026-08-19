@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-      <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VFCKQ15FEE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VFCKQ15FEE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-  gtag('config', 'G-VFCKQ15FEE');
-</script>
+    gtag('config', 'G-VFCKQ15FEE');
+  </script>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -317,15 +317,17 @@
         }
       });
 
-      // 點擊「恢復預設」按鈕：清除暫存並套用程式碼預設值
+      // 點擊「恢復預設」按鈕：強力清除儲存並重新整理，適用所有瀏覽器
       if (isDenied) {
         localStorage.removeItem('anniversary_config');
-        init();
+        
         Swal.fire({
           icon: 'success',
           title: '已恢復為程式碼預設值！',
-          timer: 1200,
+          timer: 1000,
           showConfirmButton: false
+        }).then(() => {
+          location.reload();
         });
         return;
       }
