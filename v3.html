@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VFCKQ15FEE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-VFCKQ15FEE');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>戀愛紀念日</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      background-color: #121212;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      padding: 20px 0;
+    }
+
+    /* 統一的外層容器與下方擴充區塊共用寬度 */
+    .extra-section {
+      width: 95vw;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    /* 統一的卡片區塊風格 */
+    .content-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 20px;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .content-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      border-left: 4px solid #ff4d6d;
+      padding-left: 10px;
+    }
+
+    /* 16:9 核心卡片容器（改為在區塊內呈現） */
+    .app-card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    /* 半透明背景遮罩 */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 1;
+    }
+
+    .container-card {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 4%;
+    }
+
+    .title {
+      font-size: clamp(1rem, 3.5vw, 2.2rem);
+      letter-spacing: 3px;
+      margin-bottom: 2%;
+      font-weight: 400;
+    }
+
+    .main-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 80%;
+      margin-bottom: 1%;
+    }
+
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 25%;
+    }
+
+    .avatar-wrapper {
+      width: clamp(50px, 12vw, 100px);
+      height: clamp(50px, 12vw, 100px);
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.85);
+      overflow: hidden;
+      margin-bottom: 8%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .name {
+      font-size: clamp(0.75rem, 2vw, 1.3rem);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .counter-box {
+      text-align: center;
+      flex: 1;
+    }
+
+    .days {
+      font-size: clamp(2.5rem, 9vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 2px;
+    }
+
+    .unit {
+      font-size: clamp(0.8rem, 2vw, 1.3rem);
+      margin-top: 2%;
+      margin-bottom: 3%;
+      letter-spacing: 2px;
+    }
+
+    .start-date {
+      font-size: clamp(0.7rem, 1.8vw, 1.15rem);
+      letter-spacing: 1px;
+      opacity: 0.95;
+      white-space: nowrap;
+    }
+
+    /* 按鈕共用樣式 */
+    .action-btn {
+      position: absolute;
+      bottom: 4%;
+      z-index: 10;
+      padding: 8px 16px;
+      font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 20px;
+      cursor: pointer;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      transition: background 0.2s;
+    }
+
+    .action-btn:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    /* 匯出按鈕 (右下角) */
+    .export-btn {
+      right: 4%;
+    }
+
+    /* 設定按鈕 (左下角) */
+    .settings-btn {
+      left: 4%;
+    }
+
+    /* 輪播圖片固定比例與圓角 */
+    .carousel-item img {
+      width: 100%;
+      height: 350px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    /* YouTube 響應式容器 */
+    .ratio-16x9 {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .ratio-16x9 iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 主容器：將主卡片、輪播、YT影片全部包在一致的區塊風格中 -->
+  <div class="extra-section">
+    
+    <!-- 主卡片區塊 -->
+    <div class="content-card" style="padding: 0; overflow: hidden;">
+      <div class="app-card" id="card-node">
+        <div class="overlay"></div>
+
+        <div class="container-card">
+          <div class="title" id="card-title">戀愛紀念日</div>
+
+          <div class="main-content">
+            <div class="profile">
+              <div class="avatar-wrapper">
+                <img id="left-img" src="" alt="" crossorigin="anonymous">
+              </div>
+              <div class="name" id="left-name"></div>
+            </div>
+
+            <div class="counter-box">
+              <div class="days" id="days-count">0</div>
+            </div>
+
+            <div class="profile">
+              <div class="avatar-wrapper">
+                <img id="right-img" src="" alt="" crossorigin="anonymous">
+              </div>
+              <div class="name" id="right-name"></div>
+            </div>
+          </div>
+
+          <div class="unit">天</div>
+          <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
+        </div>
+
+        <button class="action-btn settings-btn" onclick="openSettings()">⚙️</button>
+        <button class="action-btn export-btn" onclick="exportTo16by9Image()">📸</button>
+      </div>
+    </div>
+    
+    <!-- 圖片輪播區塊（透過變數動態生成） -->
+    <div class="content-card">
+      <h3>相簿回憶</h3>
+      <div id="memoryCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators" id="carousel-indicators"></div>
+        <div class="carousel-inner" id="carousel-inner"></div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#memoryCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#memoryCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- YouTube 影片區塊 -->
+    <div class="content-card">
+      <h3>專屬主題曲 / 影片</h3>
+      <div class="ratio-16x9">
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ==========================================
+    // ⚙️ 程式碼預設設定區
+    // ==========================================
+    const DEFAULT_CONFIG = {
+      title: '禾禾愛啦啦',
+      bgUrl: 'bg.jpg',
+      leftImgUrl: 'd.jpg',
+      leftName: '禾禾',
+      rightImgUrl: 'm.jpg',
+      rightName: '啦啦',
+      startDate: { year: 2023, month: 1, day: 12 },
+      // 🌟 相簿輪播圖片清單：只要在這裡增加或減少網址，畫面就會自動產生對應數量的輪播頁面！
+      carouselImages: [
+        'd.jpg',
+        'm.jpg',
+        'bg.jpg'
+      ]
+    };
+
+    function getConfig() {
+      const saved = localStorage.getItem('anniversary_config');
+      if (saved) {
+        try { 
+          const config = JSON.parse(saved);
+          if (!config.carouselImages) {
+            config.carouselImages = DEFAULT_CONFIG.carouselImages;
+          }
+          return config; 
+        } catch (e) { return DEFAULT_CONFIG; }
+      }
+      return DEFAULT_CONFIG;
+    }
+
+    function saveConfig(newConfig) {
+      localStorage.setItem('anniversary_config', JSON.stringify(newConfig));
+    }
+
+    function init() {
+      const config = getConfig();
+      const cardNode = document.getElementById('card-node');
+
+      if (config.bgUrl) {
+        cardNode.style.backgroundImage = `url('${config.bgUrl}')`;
+      }
+
+      document.getElementById('card-title').textContent = config.title;
+      document.getElementById('left-img').src = config.leftImgUrl;
+      document.getElementById('left-name').textContent = config.leftName;
+      document.getElementById('right-img').src = config.rightImgUrl;
+      document.getElementById('right-name').textContent = config.rightName;
+
+      // 動態渲染輪播圖片與指示點
+      renderCarousel(config.carouselImages);
+
+      const offset8MS = 8 * 60 * 60 * 1000;
+      const startUTC = Date.UTC(config.startDate.year, config.startDate.month - 1, config.startDate.day);
+
+      const now = new Date();
+      const todayUTC8 = new Date(now.getTime() + offset8MS);
+      const todayUTC = Date.UTC(todayUTC8.getUTCFullYear(), todayUTC8.getUTCMonth(), todayUTC8.getUTCDate());
+
+      const diffDays = Math.floor((todayUTC - startUTC) / (1000 * 60 * 60 * 24));
+      document.getElementById('days-count').textContent = diffDays;
+
+      const weekDays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+      const startDateObj = new Date(startUTC);
+      const weekName = weekDays[startDateObj.getUTCDay()];
+      const formattedMonth = String(config.startDate.month).padStart(2, '0');
+      const formattedDay = String(config.startDate.day).padStart(2, '0');
+
+      document.getElementById('date-display').textContent = 
+        `開始日 ${config.startDate.year}/${formattedMonth}/${formattedDay} ${weekName}`;
+    }
+
+    // 動態生成輪播內容函數
+    function renderCarousel(images) {
+      const indicatorsContainer = document.getElementById('carousel-indicators');
+      const innerContainer = document.getElementById('carousel-inner');
+      
+      indicatorsContainer.innerHTML = '';
+      innerContainer.innerHTML = '';
+
+      if (!images || images.length === 0) return;
+
+      images.forEach((url, index) => {
+        const indicator = document.createElement('button');
+        indicator.type = 'button';
+        indicator.setAttribute('data-bs-target', '#memoryCarousel');
+        indicator.setAttribute('data-bs-slide-to', index);
+        indicator.setAttribute('aria-label', `Slide ${index + 1}`);
+        if (index === 0) {
+          indicator.classList.add('active');
+          indicator.setAttribute('aria-current', 'true');
+        }
+        indicatorsContainer.appendChild(indicator);
+
+        const item = document.createElement('div');
+        item.classList.add('carousel-item');
+        if (index === 0) {
+          item.classList.add('active');
+        }
+
+        const img = document.createElement('img');
+        img.src = url;
+        img.classList.add('d-block', 'w-100');
+        img.alt = `回憶照片 ${index + 1}`;
+
+        item.appendChild(img);
+        innerContainer.appendChild(item);
+      });
+    }
+
+    // ==========================================
+    // ⚙️ 開啟 SweetAlert2 設定面板
+    // ==========================================
+    async function openSettings() {
+      const config = getConfig();
+
+      const { value: formValues, isDenied } = await Swal.fire({
+        title: '⚙️ 設定',
+        html: `
+          <div style="text-align: left; margin-bottom: 10px;">
+            <label style="font-size: 0.9rem; font-weight: bold; color: #333;">紀念日標題：</label>
+            <input id="swal-title" class="swal2-input" value="${config.title}" style="margin: 5px 0 15px 0; width: 100%;">
+            
+            <label style="font-size: 0.9rem; font-weight: bold; color: #333;">左邊名字：</label>
+            <input id="swal-left-name" class="swal2-input" value="${config.leftName}" style="margin: 5px 0 15px 0; width: 100%;">
+            
+            <label style="font-size: 0.9rem; font-weight: bold; color: #333;">右邊名字：</label>
+            <input id="swal-right-name" class="swal2-input" value="${config.rightName}" style="margin: 5px 0 0 0; width: 100%;">
+          </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: '保存設定',
+        denyButtonText: '🔄 恢復預設',
+        cancelButtonText: '取消',
+        confirmButtonColor: '#ff4d6d',
+        denyButtonColor: '#6c757d',
+        preConfirm: () => {
+          return {
+            title: document.getElementById('swal-title').value.trim() || DEFAULT_CONFIG.title,
+            leftName: document.getElementById('swal-left-name').value.trim() || DEFAULT_CONFIG.leftName,
+            rightName: document.getElementById('swal-right-name').value.trim() || DEFAULT_CONFIG.rightName
+          }
+        }
+      });
+
+      if (isDenied) {
+        localStorage.removeItem('anniversary_config');
+        
+        Swal.fire({
+          icon: 'success',
+          title: '已恢復為程式碼預設值！',
+          timer: 1000,
+          showConfirmButton: false
+        }).then(() => {
+          location.reload();
+        });
+        return;
+      }
+
+      if (formValues) {
+        const currentConfig = getConfig();
+        currentConfig.title = formValues.title;
+        currentConfig.leftName = formValues.leftName;
+        currentConfig.rightName = formValues.rightName;
+        
+        saveConfig(currentConfig);
+        init();
+
+        Swal.fire({
+          icon: 'success',
+          title: '已更新設定！',
+          timer: 1200,
+          showConfirmButton: false
+        });
+      }
+    }
+
+    // ==========================================
+    // 📸 產生截圖並以 SweetAlert2 彈窗顯示
+    // ==========================================
+    async function exportTo16by9Image() {
+      const config = getConfig();
+
+      Swal.fire({
+        title: '正在產生圖片...',
+        text: '請稍候，正在合成高畫質 16:9 畫面',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'fixed';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '-9999px';
+      exportContainer.style.width = '960px';
+      exportContainer.style.height = '540px';
+      exportContainer.style.backgroundImage = `url('${config.bgUrl}')`;
+      exportContainer.style.backgroundSize = 'cover';
+      exportContainer.style.backgroundPosition = 'center';
+      exportContainer.style.backgroundRepeat = 'no-repeat';
+      exportContainer.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+      exportContainer.style.color = '#ffffff';
+      exportContainer.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.4)';
+      exportContainer.style.display = 'flex';
+      exportContainer.style.flexDirection = 'column';
+      exportContainer.style.justifyContent = 'center';
+      exportContainer.style.alignItems = 'center';
+
+      exportContainer.innerHTML = `
+        <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.2);z-index:1;"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:40px;">
+          <div style="font-size:2.2rem;letter-spacing:3px;margin-bottom:15px;font-weight:400;">${config.title}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;width:650px;margin-bottom:10px;">
+            <div style="display:flex;flex-direction:column;align-items:center;width:120px;">
+              <div style="width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.85);overflow:hidden;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;justify-content:center;align-items:center;background-color:rgba(255,255,255,0.2);">
+                <img src="${config.leftImgUrl}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div style="font-size:1.3rem;font-weight:500;white-space:nowrap;">${config.leftName}</div>
+            </div>
+            <div style="text-align:center;flex:1;">
+              <div style="font-size:5.5rem;font-weight:700;line-height:1;letter-spacing:2px;">${document.getElementById('days-count').textContent}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;width:120px;">
+              <div style="width:100px;height:100px;border-radius:50%;border:3px solid rgba(255,255,255,0.85);overflow:hidden;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:flex;justify-content:center;align-items:center;background-color:rgba(255,255,255,0.2);">
+                <img src="${config.rightImgUrl}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div style="font-size:1.3rem;font-weight:500;white-space:nowrap;">${config.rightName}</div>
+            </div>
+          </div>
+          <div style="font-size:1.3rem;margin-top:15px;margin-bottom:25px;letter-spacing:2px;">天</div>
+          <div style="font-size:1.15rem;letter-spacing:1px;opacity:0.95;white-space:nowrap;">${document.getElementById('date-display').textContent}</div>
+        </div>
+      `;
+
+      document.body.appendChild(exportContainer);
+
+      try {
+        const canvas = await html2canvas(exportContainer, {
+          useCORS: true,
+          allowTaint: true,
+          scale: 2,
+          logging: false,
+          width: 960,
+          height: 540
+        });
+
+        const dataURL = canvas.toDataURL('image/png');
+        const fileDate = `${config.startDate.year}${String(config.startDate.month).padStart(2, '0')}${String(config.startDate.day).padStart(2, '0')}`;
+        const fileName = `紀念日_${fileDate}_16x9.png`;
+
+        Swal.fire({
+          title: '✨ 紀念日圖片已完成！',
+          html: `
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 12px;">手機可直接長按圖片儲存，或點下方按鈕下載</p>
+            <div style="width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+              <img src="${dataURL}" style="width: 100%; display: block; border-radius: 6px;" alt="紀念日圖片預覽">
+            </div>
+          `,
+          showCloseButton: true,
+          showConfirmButton: true,
+          confirmButtonText: '📥 直接下載圖片',
+          confirmButtonColor: '#ff4d6d',
+          width: '600px',
+          padding: '20px'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            triggerDownload(dataURL, fileName);
+          }
+        });
+
+      } catch (error) {
+        console.error('圖片匯出失敗：', error);
+        Swal.fire({
+          icon: 'error',
+          title: '匯出失敗',
+          text: '若圖片來自外部網址，請確認圖片伺服器允許跨域訪問。'
+        });
+      } finally {
+        document.body.removeChild(exportContainer);
+      }
+    }
+
+    function triggerDownload(dataURL, fileName) {
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = dataURL;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    init();
+  </script>
+</body>
+</html>
