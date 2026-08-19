@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
 <head>
   <!-- Google tag (gtag.js) -->
@@ -72,7 +71,39 @@
       padding-left: 10px;
     }
 
-    /* 16:9 核心卡片容器（改為在區塊內呈現） */
+    /* 公告跑馬燈樣式 */
+    .marquee-box {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      padding: 10px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .marquee-title {
+      font-weight: bold;
+      color: #ff4d6d;
+      margin-right: 15px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .marquee-content {
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .marquee-content marquee {
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+    }
+
+    /* 16:9 核心卡片容器 */
     .app-card {
       position: relative;
       width: 100%;
@@ -186,35 +217,32 @@
       white-space: nowrap;
     }
 
-    /* 按鈕共用樣式 */
-    .action-btn {
-      position: absolute;
-      bottom: 4%;
-      z-index: 10;
-      padding: 8px 16px;
-      font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+    /* 移到下方之後的操作按鈕區塊 */
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .control-btn {
+      flex: 1;
+      padding: 10px;
+      font-size: 0.95rem;
       color: #ffffff;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
       cursor: pointer;
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-      transition: background 0.2s;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
-    .action-btn:hover {
-      background: rgba(0, 0, 0, 0.7);
-    }
-
-    /* 匯出按鈕 (右下角) */
-    .export-btn {
-      right: 4%;
-    }
-
-    /* 設定按鈕 (左下角) */
-    .settings-btn {
-      left: 4%;
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
     }
 
     /* 輪播圖片固定比例與圓角 */
@@ -246,11 +274,21 @@
 </head>
 <body>
 
-  <!-- 主容器：將主卡片、輪播、YT影片全部包在一致的區塊風格中 -->
+  <!-- 主容器 -->
   <div class="extra-section">
     
-    <!-- 主卡片區塊 -->
-    <div class="content-card" style="padding: 0; overflow: hidden;">
+    <!-- 公告跑馬燈區塊 -->
+    <div class="marquee-box">
+      <div class="marquee-title">📢 公告</div>
+      <div class="marquee-content">
+        <marquee scrollamount="5">歡迎來到我們的戀愛紀念日網站！祝我們天天開心、幸福長久 ❤️ 持續攜手走向下一個美好的三年！</marquee>
+      </div>
+    </div>
+
+    <!-- 紀念日卡片區塊 (含下方功能按鈕) -->
+    <div class="content-card">
+      <h3>紀念日主卡片</h3>
+      
       <div class="app-card" id="card-node">
         <div class="overlay"></div>
 
@@ -280,13 +318,16 @@
           <div class="unit">天</div>
           <div class="start-date" id="date-display">開始日 2023/01/12 週四</div>
         </div>
+      </div>
 
-        <button class="action-btn settings-btn" onclick="openSettings()">⚙️</button>
-        <button class="action-btn export-btn" onclick="exportTo16by9Image()">📸</button>
+      <!-- 卡片下方的控制按鈕 -->
+      <div class="card-actions">
+        <button class="control-btn" onclick="openSettings()">⚙️ 編輯設定</button>
+        <button class="control-btn" onclick="exportTo16by9Image()">📸 匯出圖片</button>
       </div>
     </div>
     
-    <!-- 圖片輪播區塊（透過變數動態生成） -->
+    <!-- 圖片輪播區塊 -->
     <div class="content-card">
       <h3>相簿回憶</h3>
       <div id="memoryCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -317,9 +358,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // ==========================================
-    // ⚙️ 程式碼預設設定區
-    // ==========================================
     const DEFAULT_CONFIG = {
       title: '禾禾愛啦啦',
       bgUrl: 'bg.jpg',
@@ -328,7 +366,6 @@
       rightImgUrl: 'm.jpg',
       rightName: '啦啦',
       startDate: { year: 2023, month: 1, day: 12 },
-      // 🌟 相簿輪播圖片清單：只要在這裡增加或減少網址，畫面就會自動產生對應數量的輪播頁面！
       carouselImages: [
         'd.jpg',
         'm.jpg',
@@ -368,7 +405,6 @@
       document.getElementById('right-img').src = config.rightImgUrl;
       document.getElementById('right-name').textContent = config.rightName;
 
-      // 動態渲染輪播圖片與指示點
       renderCarousel(config.carouselImages);
 
       const offset8MS = 8 * 60 * 60 * 1000;
@@ -391,7 +427,6 @@
         `開始日 ${config.startDate.year}/${formattedMonth}/${formattedDay} ${weekName}`;
     }
 
-    // 動態生成輪播內容函數
     function renderCarousel(images) {
       const indicatorsContainer = document.getElementById('carousel-indicators');
       const innerContainer = document.getElementById('carousel-inner');
@@ -429,9 +464,6 @@
       });
     }
 
-    // ==========================================
-    // ⚙️ 開啟 SweetAlert2 設定面板
-    // ==========================================
     async function openSettings() {
       const config = getConfig();
 
@@ -468,7 +500,6 @@
 
       if (isDenied) {
         localStorage.removeItem('anniversary_config');
-        
         Swal.fire({
           icon: 'success',
           title: '已恢復為程式碼預設值！',
@@ -498,9 +529,6 @@
       }
     }
 
-    // ==========================================
-    // 📸 產生截圖並以 SweetAlert2 彈窗顯示
-    // ==========================================
     async function exportTo16by9Image() {
       const config = getConfig();
 
